@@ -1,0 +1,152 @@
+/* src/App.scss */
+:root {
+    --pink-primary: #ff85a1;
+    --pink-bg: #fff0f3;
+}
+
+body {
+    margin: 0;
+    background-color: var(--pink-bg);
+    cursor: url("https://cur.cursors-4u.net/symbols/sym-1/sym49.cur"), auto; // Thay con trỏ chuột thành tim (tùy chọn)
+}
+
+.min-h-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("/assets/image/1.jpg") center/cover no-repeat fixed;
+    opacity: 0.15;
+    z-index: -1;
+}
+
+// ✨ Hiệu ứng kính mờ (Glassmorphism)
+.glass-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.6);
+        transform: translateY(-10px) scale(1.02);
+    }
+}
+
+// 💖 Phong bì & Tờ thư (Sandwich cực xịn)
+.envelope-wrapper {
+    position: relative;
+    width: 320px;
+    height: 220px;
+    background: #f39c12;
+    margin: 0 auto;
+    cursor: pointer;
+    perspective: 1000px;
+    border-radius: 0 0 8px 8px;
+
+    .flap {
+        position: absolute;
+        top: 0;
+        width: 0;
+        height: 0;
+        border-left: 160px solid transparent;
+        border-right: 160px solid transparent;
+        border-top: 120px solid #e67e22;
+        transform-origin: top;
+        transition: 0.6s;
+        z-index: 3;
+    }
+
+    &::after {
+        // Mặt trước
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: #f1c40f;
+        z-index: 2;
+        clip-path: polygon(0 40%, 50% 100%, 100% 40%, 100% 100%, 0 100%);
+    }
+
+    .letter {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        width: 300px;
+        height: 180px;
+        background: white;
+        padding: 20px;
+        z-index: 1;
+        transition: 0.6s;
+        overflow-y: auto;
+        text-align: left;
+        p {
+            color: #d35400;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            font-weight: bold;
+        }
+    }
+
+    &.active {
+        .flap {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+        .letter {
+            transform: translateY(-150px);
+            z-index: 4;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+    }
+}
+
+// Tối ưu Mobile
+@media (max-width: 768px) {
+    .envelope-wrapper {
+        width: 280px;
+        .flap {
+            border-left-width: 140px;
+            border-right-width: 140px;
+        }
+        .letter {
+            width: 260px;
+        }
+    }
+    .glass-card {
+        p {
+            font-size: 0.8rem;
+        }
+    }
+}
+.cherry-blossom-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; // Để không bị chặn click vào các nút khác
+    z-index: 5; // Nằm trên ảnh nền nhưng dưới nội dung
+}
+
+.petal {
+    position: absolute;
+    background-color: #ffb7c5; // Màu hồng hoa đào
+    border-radius: 150% 0 150% 150%;
+    opacity: 1.2;
+    filter: blur(1px);
+    animation: petalFall linear infinite;
+}
+
+@keyframes petalFall {
+    0% {
+        transform: translate(0, -10px) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(100px, 100vh) rotate(45deg);
+        opacity: 0;
+    }
+}
