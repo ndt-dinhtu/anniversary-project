@@ -1,27 +1,27 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom"; // Cần thiết để đưa Lightbox lên trên cùng
 import {
   motion,
   AnimatePresence,
   useScroll,
-  useSpring,
   useTransform,
 } from "framer-motion";
 import {
   Heart,
   Calendar,
   Trophy,
-  Volume2,
-  VolumeX,
   Sparkles,
   Clock,
-  Quote,
+  X,
+  ZoomIn,
 } from "lucide-react";
-import { TIMELINE_DATA, QUIZ_QUESTIONS } from "./constants/data";
+import { TIMELINE_DATA, QUIZ_QUESTIONS, MOMENTS_DATA } from "./constants/data";
 import "./App.scss";
 
+// --- 1. Hoa Đào Rơi ---
 const createPetals = () => {
   const petals = [];
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < 50; i++) {
     const style = {
       left: `${Math.random() * 100}%`,
       width: `${Math.random() * 10 + 5}px`,
@@ -34,7 +34,7 @@ const createPetals = () => {
   return petals;
 };
 
-// --- 1. Love Quotes Chạy Ngang (Marquee) ---  
+// --- 2. Love Marquee ---
 const LoveMarquee = () => {
   const quotes = [
     "Yêu không phải là nhìn nhau, mà là cùng nhìn về một hướng.",
@@ -46,7 +46,7 @@ const LoveMarquee = () => {
     <div className="overflow-hidden bg-white/20 backdrop-blur-sm py-4 border-y border-pink-200 my-10">
       <motion.div
         animate={{ x: [0, -1000] }}
-        transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+        transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
         className="flex whitespace-nowrap gap-20 text-pink-600 font-bold italic"
       >
         {[...quotes, ...quotes].map((q, i) => (
@@ -59,153 +59,218 @@ const LoveMarquee = () => {
   );
 };
 
-// --- 2. Hero (Đồng hồ Glassmorphism) ---
+// --- 3. Hero ---
 const Hero = () => {
-  const startDate = new Date(2022, 2, 15);
+  const startDate = new Date(2022, 2, 7);
   const [timeLeft, setTimeLeft] = useState({});
-
   useEffect(() => {
     const timer = setInterval(() => {
       const diff = new Date() - startDate;
       setTimeLeft({
-        y: Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25)),
-        mo: Math.floor((diff / (1000 * 60 * 60 * 24 * 30.44)) % 12),
-        d: Math.floor((diff / (1000 * 60 * 60 * 24)) % 30),
-        h: Math.floor((diff / (1000 * 60 * 60)) % 24),
-        m: Math.floor((diff / (1000 * 60)) % 60),
-        s: Math.floor((diff / 1000) % 60),
+        Năm: Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25)),
+        Tháng: Math.floor((diff / (1000 * 60 * 60 * 24 * 30.44)) % 12),
+        Ngày: Math.floor((diff / (1000 * 60 * 60 * 24)) % 30),
+        Giờ: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        Phút: Math.floor((diff / (1000 * 60)) % 60),
+        Giây: Math.floor((diff / 1000) % 60),
       });
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
   return (
     <div className="h-screen flex flex-col justify-center items-center text-center px-4 relative z-10">
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-      >
-        <Heart className="text-pink-500 w-16 h-16 mx-auto mb-6 fill-current animate-bounce" />
-        <h2 className="text-pink-600 font-black uppercase tracking-[0.3em] text-sm mb-10">
-          Kỷ niệm tình yêu của chúng mình
-        </h2>
-
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3 max-w-5xl">
-          {Object.entries(timeLeft).map(([label, val], i) => (
-            <div
-              key={i}
-              className="glass-card p-4 rounded-3xl border border-white/50 shadow-xl"
-            >
-              <span className="text-4xl md:text-6xl font-black text-gray-800 block">
-                {val || 0}
-              </span>
-              <span className="text-[10px] md:text-xs font-bold text-pink-500 uppercase">
-                {label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+      <Heart className="text-pink-500 w-16 h-16 mb-6 fill-current animate-bounce" />
+      <h2 className="text-pink-600 font-black uppercase tracking-[0.3em] text-sm mb-10">
+        Kỷ niệm tình yêu của chúng mình
+      </h2>{" "}
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+        {Object.entries(timeLeft).map(([label, val], i) => (
+          <div key={i} className="glass-card p-4 rounded-3xl w-24 md:w-32">
+            <span className="text-3xl md:text-5xl font-black text-gray-800 block">
+              {val || 0}
+            </span>
+            <span className="text-[10px] font-bold text-pink-500 uppercase">
+              {label}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-// --- 3. TimelineItem (Parallax & 3D) ---
+// --- 4. TimelineItem ---
 const TimelineItem = ({ item, index }) => {
-  const isEven = index % 2 === 0;
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "center center"],
   });
-  const imageY = useTransform(scrollYProgress, [0, 1], [-20, 20]); // Hiệu ứng Parallax nhẹ cho ảnh
-
+  const imageY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
   return (
     <div
       ref={ref}
-      className={`flex flex-col md:flex-row items-center w-full mb-24 relative ${isEven ? "md:flex-row" : "md:flex-row-reverse"}`}
+      className={`flex flex-col md:flex-row items-center w-full mb-32 ${index % 2 === 0 ? "" : "md:flex-row-reverse"}`}
     >
-      <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center justify-center z-10">
-        <div className="w-12 h-12 rounded-full bg-pink-500 border-4 border-white shadow-xl flex items-center justify-center">
-          <Clock className="w-6 h-6 text-white" />
-        </div>
-      </div>
-
       <motion.div
-        initial={{ opacity: 0, x: isEven ? -100 : 100 }}
-        whileInView={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="w-full md:w-[45%] glass-card p-5 rounded-[2rem] shadow-2xl border border-white/40"
+        className="w-full md:w-[45%] glass-card p-4 rounded-[2.5rem]"
       >
-        <div className="overflow-hidden rounded-2xl mb-4 h-56">
+        <div className="overflow-hidden rounded-3xl h-64 mb-4">
           <motion.img
             style={{ y: imageY }}
             src={item.image}
-            className="w-full h-full object-cover scale-110"
+            className="w-full h-full object-cover scale-125"
           />
         </div>
-        <div className="flex items-center gap-2 text-pink-500 font-bold text-xs mb-2">
-          <Calendar size={14} /> {item.date}
-        </div>
         <h3 className="text-2xl font-black text-gray-800 mb-2">{item.title}</h3>
-        <p className="text-gray-600 leading-relaxed text-sm">{item.content}</p>
+        <p className="text-gray-600 text-sm leading-relaxed">{item.content}</p>
       </motion.div>
     </div>
   );
 };
 
-// --- Component 4: Quiz (Phần còn thiếu đây nè!) ---
+// --- 5. Lightbox Portal (Component riêng biệt để cưỡi lên trên mọi thứ) ---
+const Lightbox = ({ selectedImg, onClose }) => {
+  useEffect(() => {
+    document.body.style.overflow = "hidden"; // KHÓA CUỘN CHUỘT
+    return () => {
+      document.body.style.overflow = "unset";
+    }; // MỞ LẠI KHI ĐÓNG
+  }, []);
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-10000 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl touch-none"
+      onClick={onClose}
+    >
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="absolute top-6 right-6 text-white/70 hover:text-white"
+      >
+        <X size={40} />
+      </motion.button>
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="max-w-5xl w-full flex flex-col items-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <img
+          src={selectedImg.image}
+          className="max-h-[80vh] w-auto rounded-2xl shadow-2xl border border-white/10"
+          alt="moment"
+        />
+        <p className="text-white text-center mt-6 text-xl font-bold italic">
+          {selectedImg.caption}
+        </p>
+      </motion.div>
+    </div>,
+    document.body, // Dán trực tiếp vào body
+  );
+};
+
+// --- 6. MomentGallery ---
+const MomentGallery = () => {
+  const [selectedImg, setSelectedImg] = useState(null);
+  const [loaded, setLoaded] = useState({});
+
+  return (
+    <div className="py-20 relative z-10">
+      <div className="text-center mb-10 px-4">
+        <h2 className="text-3xl font-black text-gray-800 mb-2">
+          Khoảnh khắc rạng rỡ
+        </h2>
+        <p className="text-pink-500 font-medium">Vuốt để xem thêm kỷ niệm ❤️</p>
+      </div>
+
+      <div className="horizontal-slider px-10">
+        {MOMENTS_DATA.map((moment) => (
+          <div key={moment.id} className="slider-item">
+            <motion.div
+              onClick={() => setSelectedImg(moment)}
+              className="glass-card p-3 rounded-4xl cursor-pointer group"
+            >
+              <div
+                className={`relative h-80 rounded-2xl overflow-hidden ${!loaded[moment.id] ? "skeleton" : ""}`}
+              >
+                <img
+                  src={moment.image}
+                  loading="lazy"
+                  onLoad={() =>
+                    setLoaded((prev) => ({ ...prev, [moment.id]: true }))
+                  }
+                  className={`w-full h-full object-cover transition-opacity duration-500 ${loaded[moment.id] ? "opacity-100" : "opacity-0"}`}
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <ZoomIn className="text-white w-10 h-10" />
+                </div>
+              </div>
+              <p className="mt-4 text-center text-sm font-bold text-gray-700 italic px-2">
+                {moment.caption}
+              </p>
+            </motion.div>
+          </div>
+        ))}
+      </div>
+
+      <AnimatePresence>
+        {selectedImg && (
+          <Lightbox
+            selectedImg={selectedImg}
+            onClose={() => setSelectedImg(null)}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// --- 7. Quiz ---
 const Quiz = () => {
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
-
   const handleAnswer = (idx) => {
     if (idx === QUIZ_QUESTIONS[step].correctAnswer) setScore(score + 1);
     if (step < QUIZ_QUESTIONS.length - 1) setStep(step + 1);
     else setShowResult(true);
   };
-
   return (
-    <div className="max-w-md mx-auto bg-white/60 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-pink-100 relative z-10">
+    <div className="max-w-md mx-auto glass-card p-8 rounded-3xl text-center relative z-20">
       {!showResult ? (
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-          >
-            <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">
-              {QUIZ_QUESTIONS[step].question}
-            </h3>
-            <div className="space-y-3">
-              {QUIZ_QUESTIONS[step].options.map((opt, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleAnswer(i)}
-                  className="w-full p-4 text-left rounded-xl border-2 border-pink-50 hover:bg-pink-500 hover:text-white transition-all font-medium bg-white/50"
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+        <div>
+          <h3 className="text-xl font-bold mb-6 text-gray-800">
+            {QUIZ_QUESTIONS[step].question}
+          </h3>
+          <div className="space-y-3">
+            {QUIZ_QUESTIONS[step].options.map((opt, i) => (
+              <button
+                key={i}
+                onClick={() => handleAnswer(i)}
+                className="w-full p-4 rounded-2xl border-2 border-pink-100 hover:bg-pink-500 hover:text-white transition-all font-bold bg-white/40"
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
       ) : (
-        <div className="text-center py-6">
+        <div className="py-6">
           <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-          <h3 className="text-2xl font-bold text-pink-600 mb-2">Tuyệt vời!</h3>
-          <p className="text-gray-600 mb-6 font-medium">
-            Em đạt được {score}/{QUIZ_QUESTIONS.length} điểm kỷ niệm.
-          </p>
+          <h3 className="text-2xl font-black text-pink-600 mb-2">
+            Thành tích: {score}/{QUIZ_QUESTIONS.length}
+          </h3>
           <button
             onClick={() => {
               setStep(0);
               setScore(0);
               setShowResult(false);
             }}
-            className="text-pink-500 underline text-sm font-bold"
+            className="text-pink-500 font-bold underline"
           >
             Chơi lại
           </button>
@@ -222,7 +287,6 @@ export default function App() {
   const [clickHearts, setClickHearts] = useState([]);
   const audioRef = useRef(null);
 
-  // Hiệu ứng click bắn tim
   const handleGlobalClick = (e) => {
     const id = Date.now();
     setClickHearts((prev) => [...prev, { id, x: e.clientX, y: e.clientY }]);
@@ -234,17 +298,16 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen relative overflow-x-hidden font-sans"
+      className="min-h-screen relative font-sans"
       onClick={handleGlobalClick}
     >
       <div className="cherry-blossom-container">{createPetals()}</div>
-      {/* Click Hearts */}
       {clickHearts.map((h) => (
         <motion.div
           key={h.id}
-          initial={{ y: 0, opacity: 1, scale: 1 }}
-          animate={{ y: -150, opacity: 0, scale: 2 }}
-          className="fixed pointer-events-none z-[999]"
+          initial={{ y: 0, opacity: 1 }}
+          animate={{ y: -120, opacity: 0, scale: 2 }}
+          className="fixed pointer-events-none z-999 text-2xl"
           style={{ left: h.x, top: h.y }}
         >
           ❤️
@@ -258,23 +321,18 @@ export default function App() {
           <motion.div
             key="welcome"
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-pink-50 flex flex-col justify-center items-center p-6"
+            className="fixed inset-0 z-100 bg-pink-50 flex flex-col justify-center items-center"
           >
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            >
-              <Heart className="text-pink-500 w-24 h-24 fill-current" />
-            </motion.div>
-            <h1 className="text-4xl font-black mt-6 mb-2">Our Sweet Memory</h1>
+            <Heart className="text-pink-500 w-20 h-20 fill-current animate-pulse" />
+            <h1 className="text-4xl font-black mt-8">Our Sweet Memory</h1>
             <button
               onClick={() => {
                 setIsStarted(true);
                 audioRef.current.play();
               }}
-              className="mt-10 px-10 py-4 bg-pink-500 text-white rounded-full font-bold shadow-xl hover:scale-110 transition-transform"
+              className="mt-12 px-12 py-4 bg-pink-500 text-white rounded-full font-bold shadow-2xl hover:scale-110 transition-transform"
             >
-              Khám phá ngay ✨
+              Bắt đầu ✨
             </button>
           </motion.div>
         ) : (
@@ -282,22 +340,21 @@ export default function App() {
             key="main"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="relative z-10"
           >
             <Hero />
             <LoveMarquee />
 
             <div className="max-w-6xl mx-auto px-6 py-20 relative">
-              <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-300 via-pink-500 to-pink-300 -translate-x-1/2 hidden md:block" />
+              <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-pink-200 -translate-x-1/2 hidden md:block" />
               {TIMELINE_DATA.map((item, idx) => (
                 <TimelineItem key={idx} item={item} index={idx} />
               ))}
             </div>
 
+            <MomentGallery />
+
             <div className="py-20 flex justify-center">
-              <div className="w-full max-w-md">
-                <Quiz />
-              </div>
+              <Quiz />
             </div>
 
             <div className="py-40 text-center">
@@ -314,6 +371,7 @@ export default function App() {
                 <div className="flap"></div>
                 <div className="letter">
                   <p>
+                    {" "}
                     "1.460 ngày qua là món quà vô giá nhất mà định mệnh đã dành
                     tặng anh. Cảm ơn em đã dùng sự bao dung để xoa dịu những
                     thiếu sót, và dùng yêu thương để định nghĩa lại thế giới của
@@ -324,9 +382,8 @@ export default function App() {
                 </div>
               </div>
             </div>
-
             <footer className="py-10 text-center opacity-50 text-xs font-bold uppercase tracking-widest">
-              Designed with ❤️ for You
+              Kỉ niệm 4 năm 2022-2026
             </footer>
           </motion.div>
         )}

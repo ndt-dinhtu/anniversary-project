@@ -4,28 +4,53 @@
     --pink-bg: #fff0f3;
 }
 
+html,
 body {
+    height: auto;
+    min-height: 100%;
     margin: 0;
     background-color: var(--pink-bg);
-    cursor: url("https://cur.cursors-4u.net/symbols/sym-1/sym49.cur"), auto; // Thay con trỏ chuột thành tim (tùy chọn)
+    cursor: url("https://cur.cursors-4u.net/symbols/sym-1/sym49.cur"), auto;
+    overflow-x: hidden;
 }
 
 .min-h-screen::before {
     content: "";
     position: absolute;
-    inset: 0;
-    background: url("/assets/image/1.jpg") center/cover no-repeat fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/assets/image/1.jpg") center top / cover no-repeat scroll;
     opacity: 0.15;
     z-index: -1;
+    pointer-events: none;
 }
 
-// ✨ Hiệu ứng kính mờ (Glassmorphism)
+// ✨ Hiệu ứng Skeleton (Loading)
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #ffe4e9 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+// ✨ Glassmorphism
 .glass-card {
     background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
 
     &:hover {
         background: rgba(255, 255, 255, 0.6);
@@ -33,7 +58,32 @@ body {
     }
 }
 
-// 💖 Phong bì & Tờ thư (Sandwich cực xịn)
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+// 💖 Slider Lướt Ngang
+.horizontal-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1.5rem;
+    padding: 2rem;
+    scrollbar-width: none; // Ẩn scrollbar cho Firefox
+    &::-webkit-scrollbar {
+        display: none;
+    } // Ẩn scrollbar cho Chrome
+
+    .slider-item {
+        flex: 0 0 280px;
+        scroll-snap-align: center;
+        @media (min-width: 768px) {
+            flex: 0 0 350px;
+        }
+    }
+}
+
+// 💖 Phong bì & Tờ thư
 .envelope-wrapper {
     position: relative;
     width: 320px;
@@ -58,7 +108,6 @@ body {
     }
 
     &::after {
-        // Mặt trước
         content: "";
         position: absolute;
         inset: 0;
@@ -100,39 +149,22 @@ body {
     }
 }
 
-// Tối ưu Mobile
-@media (max-width: 768px) {
-    .envelope-wrapper {
-        width: 280px;
-        .flap {
-            border-left-width: 140px;
-            border-right-width: 140px;
-        }
-        .letter {
-            width: 260px;
-        }
-    }
-    .glass-card {
-        p {
-            font-size: 0.8rem;
-        }
-    }
-}
+// 🌸 Hoa đào
 .cherry-blossom-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; // Để không bị chặn click vào các nút khác
-    z-index: 5; // Nằm trên ảnh nền nhưng dưới nội dung
+    pointer-events: none;
+    z-index: 5;
 }
 
 .petal {
     position: absolute;
-    background-color: #ffb7c5; // Màu hồng hoa đào
+    background-color: #ffb7c5;
     border-radius: 150% 0 150% 150%;
-    opacity: 1.2;
+    opacity: 0.8;
     filter: blur(1px);
     animation: petalFall linear infinite;
 }
@@ -149,4 +181,39 @@ body {
         transform: translate(100px, 100vh) rotate(45deg);
         opacity: 0;
     }
+}
+
+@media (max-width: 768px) {
+    .envelope-wrapper {
+        width: 280px;
+        .flap {
+            border-left-width: 140px;
+            border-right-width: 140px;
+        }
+        .letter {
+            width: 260px;
+        }
+    }
+}
+
+// Khóa cuộn khi mở Lightbox (Portal)
+body {
+    &[style*="overflow: hidden"] {
+        padding-right: 0px !important; // Tránh việc trang bị giật khi ẩn thanh scroll
+    }
+}
+
+// Ép lớp Portal luôn ở trên cùng tuyệt đối
+.fixed.z-\[10000\] {
+    z-index: 10000 !important;
+}
+
+// Giới hạn Z-index của các phần khác để không tranh giành
+.glass-card {
+    z-index: 10;
+}
+
+// Riêng phần Quiz cho z-index vừa đủ
+.z-20 {
+    z-index: 20;
 }
