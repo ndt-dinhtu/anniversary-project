@@ -61,12 +61,17 @@ const LoveMarquee = () => {
 
 // --- 3. Hero ---
 const Hero = () => {
+  // Ngày kỷ niệm: 07/03/2022 (Tháng 3 là index 2)
   const startDate = new Date(2022, 2, 7);
-  const [timeLeft, setTimeLeft] = useState({});
+  const [counters, setCounters] = useState({});
+
   useEffect(() => {
     const timer = setInterval(() => {
-      const diff = new Date() - startDate;
-      setTimeLeft({
+      const now = new Date();
+      const diff = now - startDate;
+
+      setCounters({
+        "Tổng Ngày": Math.floor(diff / (1000 * 60 * 60 * 24)),
         Năm: Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25)),
         Tháng: Math.floor((diff / (1000 * 60 * 60 * 24 * 30.44)) % 12),
         Ngày: Math.floor((diff / (1000 * 60 * 60 * 24)) % 30),
@@ -77,24 +82,53 @@ const Hero = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
   return (
     <div className="h-screen flex flex-col justify-center items-center text-center px-4 relative z-10">
-      <Heart className="text-pink-500 w-16 h-16 mb-6 fill-current animate-bounce" />
-      <h2 className="text-pink-600 font-black uppercase tracking-[0.3em] text-sm mb-10">
-        Kỷ niệm tình yêu của chúng mình
-      </h2>{" "}
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-        {Object.entries(timeLeft).map(([label, val], i) => (
-          <div key={i} className="glass-card p-4 rounded-3xl w-24 md:w-32">
-            <span className="text-3xl md:text-5xl font-black text-gray-800 block">
-              {val || 0}
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+        <Heart className="text-pink-500 w-16 h-16 mx-auto mb-6 fill-current animate-bounce" />
+        <h2 className="text-pink-600 font-black uppercase tracking-[0.3em] text-sm mb-10">
+          Hành trình hạnh phúc của chúng mình
+        </h2>
+
+        {/* Layout đồng hồ: Tổng ngày to nhất, các đơn vị khác nhỏ hơn bên dưới */}
+        <div className="flex flex-col items-center gap-6">
+          {/* Ô Tổng Ngày nổi bật */}
+          <div className="glass-card p-8 rounded-[3rem] border-2 border-pink-300 shadow-[0_0_30px_rgba(255,133,161,0.3)] min-w-[200px]">
+            <span className="text-6xl md:text-8xl font-black text-gray-800 block">
+              {counters["Tổng Ngày"] || 0}
             </span>
-            <span className="text-[10px] font-bold text-pink-500 uppercase">
-              {label}
+            <span className="text-sm font-bold text-pink-500 uppercase tracking-widest">
+              Ngày bên nhau ❤️
             </span>
           </div>
-        ))}
-      </div>
+
+          {/* Các đơn vị lẻ bên dưới */}
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 max-w-5xl">
+            {Object.entries(counters).map(
+              ([label, val], i) =>
+                // Bỏ qua cái Tổng Ngày vì đã hiện ở trên rồi
+                label !== "Tổng Ngày" && (
+                  <div
+                    key={i}
+                    className="glass-card p-3 md:p-4 rounded-3xl w-24 md:w-32 border border-white/50"
+                  >
+                    <span className="text-2xl md:text-4xl font-black text-gray-700 block">
+                      {val || 0}
+                    </span>
+                    <span className="text-[10px] md:text-xs font-bold text-pink-400 uppercase">
+                      {label}
+                    </span>
+                  </div>
+                ),
+            )}
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };
@@ -107,10 +141,13 @@ const TimelineItem = ({ item, index }) => {
     offset: ["start end", "center center"],
   });
   const imageY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
+
   return (
     <div
       ref={ref}
-      className={`flex flex-col md:flex-row items-center w-full mb-32 ${index % 2 === 0 ? "" : "md:flex-row-reverse"}`}
+      className={`flex flex-col md:flex-row items-center w-full mb-8 ${
+        index % 2 === 0 ? "" : "md:flex-row-reverse"
+      }`}
     >
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -131,7 +168,6 @@ const TimelineItem = ({ item, index }) => {
     </div>
   );
 };
-
 // --- 5. Lightbox Portal (Component riêng biệt để cưỡi lên trên mọi thứ) ---
 const Lightbox = ({ selectedImg, onClose }) => {
   useEffect(() => {
@@ -169,7 +205,7 @@ const Lightbox = ({ selectedImg, onClose }) => {
         </p>
       </motion.div>
     </div>,
-    document.body, // Dán trực tiếp vào body
+    document.body, 
   );
 };
 
@@ -280,6 +316,28 @@ const Quiz = () => {
   );
 };
 
+const MusicPlayer = ({ isPlaying, togglePlay }) => {
+  return (
+    <div 
+      className="fixed bottom-6 right-6 z-[100] flex items-center gap-4 bg-white/60 backdrop-blur-md p-2 pr-6 rounded-full border border-pink-200 shadow-lg cursor-pointer"
+      onClick={togglePlay}
+    >
+      <div className={`relative w-12 h-12 rounded-full overflow-hidden border-2 border-gray-800 shadow-inner flex items-center justify-center ${isPlaying ? 'animate-spin-slow' : ''}`}>
+         {/* Giả lập đĩa than */}
+         <div className="absolute inset-0 bg-[radial-gradient(circle,_#333_10%,_#111_100%)]"></div>
+         <div className="absolute w-3 h-3 bg-pink-500 rounded-full z-10 border-2 border-gray-800"></div>
+         {/* Các vòng tròn trên đĩa */}
+         <div className="absolute inset-2 border border-white/10 rounded-full"></div>
+         <div className="absolute inset-4 border border-white/5 rounded-full"></div>
+      </div>
+      <div>
+        <p className="text-[10px] font-bold uppercase text-pink-500 tracking-tighter">Đang phát</p>
+        <p className="text-xs font-black text-gray-700 truncate w-24">Beautiful in White</p>
+      </div>
+    </div>
+  );
+};
+
 // --- MAIN APP ---
 export default function App() {
   const [isStarted, setIsStarted] = useState(false);
@@ -344,7 +402,9 @@ export default function App() {
             <Hero />
             <LoveMarquee />
 
-            <div className="max-w-6xl mx-auto px-6 py-20 relative">
+            <div className="max-w-6xl mx-auto px-6 py-5 relative">
+              {" "}
+              {/* Đổi py-20 thành py-10 */}
               <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-pink-200 -translate-x-1/2 hidden md:block" />
               {TIMELINE_DATA.map((item, idx) => (
                 <TimelineItem key={idx} item={item} index={idx} />
