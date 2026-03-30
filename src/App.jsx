@@ -62,7 +62,7 @@ const LoveMarquee = () => {
 // --- 3. Hero ---
 const Hero = () => {
   // Ngày kỷ niệm: 07/03/2022 (Tháng 3 là index 2)
-  const startDate = new Date(2022, 2, 7);
+  const startDate = new Date(2022, 2, 27);
   const [counters, setCounters] = useState({});
 
   useEffect(() => {
@@ -205,7 +205,7 @@ const Lightbox = ({ selectedImg, onClose }) => {
         </p>
       </motion.div>
     </div>,
-    document.body, 
+    document.body,
   );
 };
 
@@ -318,21 +318,27 @@ const Quiz = () => {
 
 const MusicPlayer = ({ isPlaying, togglePlay }) => {
   return (
-    <div 
+    <div
       className="fixed bottom-6 right-6 z-[100] flex items-center gap-4 bg-white/60 backdrop-blur-md p-2 pr-6 rounded-full border border-pink-200 shadow-lg cursor-pointer"
       onClick={togglePlay}
     >
-      <div className={`relative w-12 h-12 rounded-full overflow-hidden border-2 border-gray-800 shadow-inner flex items-center justify-center ${isPlaying ? 'animate-spin-slow' : ''}`}>
-         {/* Giả lập đĩa than */}
-         <div className="absolute inset-0 bg-[radial-gradient(circle,_#333_10%,_#111_100%)]"></div>
-         <div className="absolute w-3 h-3 bg-pink-500 rounded-full z-10 border-2 border-gray-800"></div>
-         {/* Các vòng tròn trên đĩa */}
-         <div className="absolute inset-2 border border-white/10 rounded-full"></div>
-         <div className="absolute inset-4 border border-white/5 rounded-full"></div>
+      <div
+        className={`relative w-12 h-12 rounded-full overflow-hidden border-2 border-gray-800 shadow-inner flex items-center justify-center ${isPlaying ? "animate-spin-slow" : ""}`}
+      >
+        {/* Giả lập đĩa than */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle,_#333_10%,_#111_100%)]"></div>
+        <div className="absolute w-3 h-3 bg-pink-500 rounded-full z-10 border-2 border-gray-800"></div>
+        {/* Các vòng tròn trên đĩa */}
+        <div className="absolute inset-2 border border-white/10 rounded-full"></div>
+        <div className="absolute inset-4 border border-white/5 rounded-full"></div>
       </div>
       <div>
-        <p className="text-[10px] font-bold uppercase text-pink-500 tracking-tighter">Đang phát</p>
-        <p className="text-xs font-black text-gray-700 truncate w-24">Beautiful in White</p>
+        <p className="text-[10px] font-bold uppercase text-pink-500 tracking-tighter">
+          Đang phát
+        </p>
+        <p className="text-xs font-black text-gray-700 truncate w-24">
+          Beautiful in White
+        </p>
       </div>
     </div>
   );

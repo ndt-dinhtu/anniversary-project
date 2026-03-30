@@ -1,11 +1,19 @@
 export const TIMELINE_DATA = [
   {
     id: 1,
-    date: "07/03/2022",
+    date: "01/03/2022",
     title: "Những ngày đầu tiên gặp gỡ",
     content:
       "Cái chạm mắt đầu tiên khiến tim anh hẫng đi một nhịp. Cả hai đều thẹn thùng, chẳng dám nói câu gì.",
     image: "/assets/image/i (35).jpg",
+  },
+  {
+    id: 6,
+    date: "07/03/2022",
+    title: "Lời tỏ tình định mệnh",
+    content:
+      "Dưới ánh đèn đường lung linh, anh đã lấy hết can đảm để nói câu 'Anh yêu em'. Thật hạnh phúc vì em đã đồng ý.",
+    image: "/assets/image/i (36).jpg",
   },
   {
     id: 2,
@@ -39,14 +47,7 @@ export const TIMELINE_DATA = [
       "Buổi chiều bình yên nắm tay em đi dạo, cảm giác như thời gian đang ngừng trôi chỉ dành riêng cho hai đứa.",
     image: "/assets/image/i (2).jpg",
   },
-  {
-    id: 6,
-    date: "20/10/2022",
-    title: "Lời tỏ tình định mệnh",
-    content:
-      "Dưới ánh đèn đường lung linh, anh đã lấy hết can đảm để nói câu 'Anh yêu em'. Thật hạnh phúc vì em đã đồng ý.",
-    image: "/assets/image/i (36).jpg",
-  },
+
   {
     id: 7,
     date: "16/12/2022",
